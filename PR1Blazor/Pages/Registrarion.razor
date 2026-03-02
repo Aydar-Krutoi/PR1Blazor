@@ -1,0 +1,58 @@
+@page "/registrarion"
+@using PR1Blazor.ApiRequest
+@using PR1Blazor.ApiRequest.Models
+<h3>Регистрация</h3>
+
+<div class="card-body">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Логин</label>
+            <input type="text" class="form-control" @bind="userShort.Login" />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Пароль</label>
+            <input type="password" class="form-control" @bind="userShort.Password" />
+        </div>
+
+        <div class="col-md-12">
+            <label class="form-label">Имя</label>
+            <input type="text" class="form-control" @bind="userShort.Name" />
+        </div>
+
+        <div class="col-md-12">
+            <label class="form-label">Описание</label>
+            <textarea class="form-control" @bind="userShort.Descrioption"></textarea>
+        </div>
+
+        <div class="col-12 mt-4 d-flex gap-2">
+            <button class="btn btn-success w-100" @onclick="AddUser">Зарегистрировать</button>
+            
+        </div>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mb-4 text-center py-2">@errorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Inject] private RequestApi _apiRequest { get; set; }
+    private UserShort userShort = new UserShort();
+    private string errorMessage;
+    
+    private async Task AddUser()
+    {
+        var addUser = await _apiRequest.AddNewUser(userShort);
+        
+        if (!addUser.status)
+        {
+            errorMessage = addUser.message;
+        }
+        else
+        {
+            errorMessage = "Успешный вход";
+        }
+       
+    }
+}

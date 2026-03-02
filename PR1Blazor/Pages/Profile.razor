@@ -1,0 +1,55 @@
+﻿@page "/profile"
+@using PR1Blazor.ApiRequest
+@using PR1Blazor.ApiRequest.Models
+@inject NavigationManager Navigation
+
+<PageTitle>Мой профиль</PageTitle>
+
+<div class="container mt-4">
+    <h2>Личный кабинет</h2>
+
+    @if (profile == null)
+    {
+        <p><em>Загрузка данных профиля...</em></p>
+    }
+    else
+    {
+        <div class="card shadow-sm" style="max-width: 500px;">
+            <div class="card-body">
+                <h5 class="card-title text-primary">@profile.name</h5>
+                <hr />
+                <p><strong>Логин:</strong> @profile.login</p>
+                <p><strong>О себе:</strong> @(profile.description)</p>
+                <p><strong>Роль в системе:</strong> @(profile.role == 1 ? "Администратор" : "Пользователь")</p>
+                
+                <div class="mt-4">
+                    <button class="btn btn-outline-danger btn-sm" @onclick="Logout">Выйти из системы</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Inject] private RequestApi _apiRequest { get; set; }
+    private ProfileData? profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _apiRequest.GetMyProfileAsync();
+        
+        if (result.status && result.data != null)
+        {
+            profile = result.data;
+        }
+        else
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+
+    private void Logout()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

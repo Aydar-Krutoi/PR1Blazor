@@ -1,0 +1,171 @@
+﻿@page "/admin"
+@using PR1Blazor.ApiRequest
+@inject UserSession Session
+@inject NavigationManager Navigation
+@using PR1Blazor.ApiRequest.Models
+
+<PageTitle>Админ</PageTitle>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (users == null)
+    {
+        <tr><td colspan="4" class="text-center">Загрузка данных...</td></tr>
+    }
+    else if (users.Count == 0)
+    {
+        <tr><td colspan="4" class="text-center">Пользователи не найдены</td></tr>
+    }
+    else
+    {
+        @foreach (var user in users)
+        {
+            <tr>
+                <td>@user.id_User</td>
+                <td>@(user.Name ?? "—")</td>
+                <td>@(user.Descrioption ?? "—")</td>
+                <td>
+                    <button class="btn btn-primary btn-sm me-1" @onclick="() => PrepareUpdate(user)">Редактировать</button>
+                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.id_User)">Удалить</button>
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+
+<hr />
+<div class="card mt-4 shadow-sm" style="max-width: 600px;">
+    <div class="card-header @(isEditMode ? "bg-primary" : "bg-dark") text-white">
+        <h5 class="mb-0">@(isEditMode ? "Редактировать пользователя" : "Добавить нового пользователя")</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Логин</label>
+                <input type="text" class="form-control" @bind="userShort.Login" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Пароль</label>
+                <input type="password" class="form-control" @bind="userShort.Password" />
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Имя</label>
+                <input type="text" class="form-control" @bind="userShort.Name" />
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Описание</label>
+                <textarea class="form-control" @bind="userShort.Descrioption"></textarea>
+            </div>
+
+            <div class="col-12 mt-4 d-flex gap-2">
+                @if (isEditMode)
+                {
+                    <button class="btn btn-primary w-100" @onclick="UpdateUser">Сохранить изменения</button>
+                    <button class="btn btn-secondary w-50" @onclick="CancelEdit">Отмена</button>
+                }
+                else
+                {
+                    <button class="btn btn-success w-100" @onclick="AddUser">Зарегистрировать</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<UserDataShort> users;
+    private UserShort userShort = new UserShort();
+    private int? editingUserId = null;
+    private bool isEditMode = false;
+
+    [Inject] private RequestApi _apiRequest { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsAdmin)
+        {
+            Navigation.NavigateTo("/profile"); 
+        }
+        await getAllUser();
+    }
+
+    private async Task getAllUser()
+    {
+        var userData = await _apiRequest.GetAllUserAsync();
+        users = userData?.data?.users ?? new List<UserDataShort>();
+        StateHasChanged();
+    }
+
+    private void PrepareUpdate(UserDataShort user)
+    {
+        isEditMode = true;
+        editingUserId = user.id_User;
+        
+        userShort = new UserShort
+        {
+            Name = user.Name,
+            Descrioption = user.Descrioption,
+            Login = "", 
+            Password = ""
+        };
+    }
+
+    private void CancelEdit()
+    {
+        isEditMode = false;
+        editingUserId = null;
+        userShort = new UserShort();
+    }
+
+    private async Task UpdateUser()
+    {
+        if (editingUserId == null) return; 
+
+        var updateData = new UpdateUser
+        {
+            Id = editingUserId.Value,
+            Name = userShort.Name,
+            Description = userShort.Descrioption,
+            Login = userShort.Login,
+            Password = userShort.Password
+        };
+
+        var result = await _apiRequest.UpdateUserAsync(updateData);
+        if (result.status)
+        {
+            await getAllUser();
+            CancelEdit();
+        }
+    }
+
+    private async Task AddUser()
+    {
+        var addUser = await _apiRequest.AddNewUser(userShort);
+        if (addUser.status) 
+        {
+            userShort = new UserShort();
+            await getAllUser(); 
+        }
+    }
+    
+    private async Task DeleteUser(int id)
+    {
+        var result = await _apiRequest.DeleteUserAsync(id);
+        if (result.status)
+        {
+            await getAllUser(); 
+        }
+    }
+}

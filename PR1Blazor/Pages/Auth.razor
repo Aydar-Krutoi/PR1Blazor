@@ -1,0 +1,67 @@
+﻿@page "/login"
+@using PR1Blazor.ApiRequest
+@using PR1Blazor.ApiRequest.Models
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>Вход в систему</PageTitle>
+
+<h1>Вход в систему</h1>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100 px-3">
+    <div style="width: 100%; max-width: 360px;">
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mb-4 text-center py-2">@errorMessage</div>
+        }
+
+        <div class="mb-4">
+            <input type="email" @bind="@_loginRequest.LoginR" placeholder="Email"
+                   class="form-control form-control-lg border-0 border-bottom rounded-0 bg-light"/>
+        </div>
+
+        <div class="mb-4">
+            <input type="password" @bind="@_loginRequest.PasswordR" placeholder="Пароль"
+                   class="form-control form-control-lg border-0 border-bottom rounded-0 bg-light"/>
+        </div>
+
+        <button class="btn btn-primary btn-lg w-100 rounded-pill fw-medium py-3"
+                @onclick="Login" type="button">
+            Войти
+        </button>
+
+        <p class="text-center mt-4 small text-muted">
+            Нет аккаунта?
+            <a href="/registrarion" class="text-primary fw-medium text-decoration-none">Зарегистрироваться</a>
+        </p>
+    </div>
+</div>
+
+@code
+{
+    [Inject] private RequestApi _apiRequest { get; set; }
+    private LoginRequest _loginRequest = new LoginRequest();
+    private string errorMessage;
+
+    private async Task Login()
+    {
+        errorMessage = null;
+        var result = await _apiRequest.Authorized(_loginRequest);
+        if (result.status)
+        {
+            Session.Role = result.role;
+            
+            if (result.role == 2)
+            Navigation.NavigateTo("/profile");
+            else
+            {
+                Navigation.NavigateTo("/admin");
+            }
+        }
+        else
+        {
+            errorMessage = result.message;
+        }
+    }
+}
