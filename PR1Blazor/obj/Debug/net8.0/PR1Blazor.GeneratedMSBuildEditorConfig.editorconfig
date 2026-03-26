@@ -30,8 +30,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/aydar/RiderProjects/PR1Blazor/PR1Blazor/Pages/AllMoviePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWxsTW92aWVQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/aydar/RiderProjects/PR1Blazor/PR1Blazor/Pages/Auth.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQXV0aC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/aydar/RiderProjects/PR1Blazor/PR1Blazor/Pages/Movie.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTW92aWUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/aydar/RiderProjects/PR1Blazor/PR1Blazor/Pages/MovieForAdmin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTW92aWVGb3JBZG1pbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/aydar/RiderProjects/PR1Blazor/PR1Blazor/Pages/Profile.razor]

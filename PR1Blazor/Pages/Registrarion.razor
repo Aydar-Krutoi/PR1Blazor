@@ -1,33 +1,35 @@
 @page "/registrarion"
 @using PR1Blazor.ApiRequest
 @using PR1Blazor.ApiRequest.Models
+
+@inject NavigationManager Navigation
 <h3>Регистрация</h3>
 
 <div class="card-body">
     <div class="row g-3">
         <div class="col-md-6">
             <label class="form-label">Логин</label>
-            <input type="text" class="form-control" @bind="userShort.Login" />
+            <input type="text" class="form-control" @bind="_authRequest.Login" />
         </div>
 
         <div class="col-md-6">
             <label class="form-label">Пароль</label>
-            <input type="password" class="form-control" @bind="userShort.Password" />
+            <input type="password" class="form-control" @bind="_authRequest.Password" />
         </div>
 
         <div class="col-md-12">
             <label class="form-label">Имя</label>
-            <input type="text" class="form-control" @bind="userShort.Name" />
+            <input type="text" class="form-control" @bind="_authRequest.Name" />
         </div>
 
         <div class="col-md-12">
             <label class="form-label">Описание</label>
-            <textarea class="form-control" @bind="userShort.Descrioption"></textarea>
+            <textarea class="form-control" @bind="_authRequest.Descrioption"></textarea>
         </div>
 
         <div class="col-12 mt-4 d-flex gap-2">
             <button class="btn btn-success w-100" @onclick="AddUser">Зарегистрировать</button>
-            
+
         </div>
         @if (!string.IsNullOrEmpty(errorMessage))
         {
@@ -38,21 +40,28 @@
 
 @code {
     [Inject] private RequestApi _apiRequest { get; set; }
-    private UserShort userShort = new UserShort();
+    private AuthRequest _authRequest = new AuthRequest();
     private string errorMessage;
-    
+
     private async Task AddUser()
     {
-        var addUser = await _apiRequest.AddNewUser(userShort);
+        errorMessage = "";
         
-        if (!addUser.status)
+        if (string.IsNullOrWhiteSpace(_authRequest.Login) || string.IsNullOrWhiteSpace(_authRequest.Password))
         {
-            errorMessage = addUser.message;
+            errorMessage = "Пожалуйста, заполните логин и пароль.";
+            return;
         }
-        else
-        {
-            errorMessage = "Успешный вход";
-        }
-       
+        
+       var reqAddUser = await _apiRequest.AddNewUser(_authRequest);
+
+       if (reqAddUser.status)
+       {
+           Navigation.NavigateTo("/");
+       }
+       else
+       {
+           errorMessage = reqAddUser.message ?? "Ошибка регистрации. Попробуйте другой логин.";
+       }
     }
 }

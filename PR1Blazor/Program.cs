@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PR1Blazor;
 using PR1Blazor.ApiRequest;
 using PR1Blazor.ApiRequest.Models;
+using PR1Blazor.ApiRequest.Models.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -13,6 +14,6 @@ builder.Services.AddScoped(sp => new HttpClient
     BaseAddress = new Uri("http://localhost:5115")
 });
 builder.Services.AddScoped<RequestApi>();
-builder.Services.AddScoped<UserSession>();
+builder.Services.AddScoped<UserService>();
 
 await builder.Build().RunAsync();
